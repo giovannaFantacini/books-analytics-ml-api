@@ -1,0 +1,7 @@
+requests
+bs4
+pandas
+fastapi
+uvicorn
+sklearn
+dotenv
