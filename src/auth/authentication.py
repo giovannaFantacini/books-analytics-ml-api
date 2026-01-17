@@ -5,18 +5,17 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from jose.exceptions import ExpiredSignatureError
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-AUTH_USERNAME = (os.getenv("AUTH_USERNAME", "admin") or "").strip()
-AUTH_PASSWORD = (os.getenv("AUTH_PASSWORD") or "").strip()
-
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "supersecretkey")
-ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
-REFRESH_TOKEN_EXPIRE_MINUTES = int(os.getenv("REFRESH_TOKEN_EXPIRE_MINUTES", "1440"))
+AUTH_USERNAME="admin"
+AUTH_PASSWORD="admin123"
+JWT_SECRET_KEY="supersecretkey"
+JWT_ALGORITHM="HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_MINUTES=1440
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
@@ -35,48 +34,107 @@ def authenticate_user(username: str, password: str) -> bool:
         return False
     return verify_password(password)
 
-
 def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] = None) -> str:
     to_encode = data.copy()
-    expire = datetime.datetime.utc() + (
-        expires_delta if expires_delta else datetime.timedelta(minutes=15)
-    )
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    now = datetime.datetime.now(datetime.timezone.utc)
+    expire = now + (expires_delta if expires_delta else datetime.timedelta(minutes=15))
+    to_encode.update({"exp": expire, "type": "access"}) 
+    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 
 def create_refresh_token(data: dict, expires_delta: Optional[datetime.timedelta] = None) -> str:
     to_encode = data.copy()
-    expire = datetime.datetime.utc() + (
-        expires_delta if expires_delta else datetime.timedelta(days=1)
-    )
+    now = datetime.datetime.now(datetime.timezone.utc)
+    expire = now + (expires_delta if expires_delta else datetime.timedelta(days=1))
     to_encode.update({"exp": expire, "type": "refresh"})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+def decode_access_token(token: str) -> dict:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Could not validate token",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+
+        # bloqueia refresh token usado como access
+        if payload.get("type") == "refresh":
+            raise credentials_exception
+
+        sub = payload.get("sub")
+        if not sub:
+            raise credentials_exception
+
+        return payload
+    except JWTError:
+        raise credentials_exception
+
+
+def get_current_payload(token: str = Depends(oauth2_scheme)) -> dict:
+    return decode_access_token(token)
+
+
+def require_admin(payload: dict = Depends(get_current_payload)) -> dict:
+    if payload.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions",
+        )
+    return payload
+
+def decode_refresh_token(token: str) -> str:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate refresh token",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str | None = payload.get("sub")
-        if username is None:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+
+        token_type = payload.get("type")
+        if token_type != "refresh":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Invalid token type: expected 'refresh', got '{token_type}'",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        username = payload.get("sub")
+        if not username:
             raise credentials_exception
+
+        return username
+
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     except JWTError:
         raise credentials_exception
+    
+def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate token",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
 
-    # garante que o token pertence ao usuário do .env
-    if username != AUTH_USERNAME:
+        # bloqueia refresh token sendo usado como access
+        if payload.get("type") == "refresh":
+            raise credentials_exception
+
+        username = payload.get("sub")
+        if not username:
+            raise credentials_exception
+
+        return username
+    except JWTError:
         raise credentials_exception
-
-    return {"username": AUTH_USERNAME, "disabled": False}
-
-
-async def get_current_active_user(current_user: dict = Depends(get_current_user)) -> dict:
-    if current_user.get("disabled"):
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
+    
