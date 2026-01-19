@@ -110,20 +110,7 @@ source .venv/bin/activate  # Linux / Mac
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Configuração de Variáveis de Ambiente
-Crie um arquivo .env na raiz do projeto com o seguinte conteúdo:
-```bash
-AUTH_USERNAME=admin
-AUTH_PASSWORD=admin123
-
-JWT_SECRET_KEY=supersecretkey
-JWT_ALGORITHM=HS256
-
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-REFRESH_TOKEN_EXPIRE_MINUTES=1440
-```
-
-### 5️⃣ Executar a API localmente
+### 4️⃣ Executar a API localmente
 ```bash
 uvicorn scr.api.main:app --reload
 ```
@@ -237,83 +224,10 @@ Authorization: Bearer <access_token>
 }
 ```
 
-## 📚 Endpoints da API
-
-### 📘 Books
-
-- **GET** `/api/v1/books`  
-  Retorna todos os livros disponíveis.
-
-- **GET** `/api/v1/books/{id}`  
-  Retorna os detalhes de um livro específico pelo índice.
-
-- **GET** `/api/v1/books/search?title=&category=`  
-  Busca livros por título e/ou categoria.
-
-- **GET** `/api/v1/books/top-rated`  
-  Lista os livros com melhor avaliação.
-
-- **GET** `/api/v1/books/price-range?min=&max=`  
-  Filtra livros dentro de uma faixa de preço.
-
----
-
-### 🗂 Categories
-
-- **GET** `/api/v1/categories`  
-  Lista todas as categorias disponíveis.
-
----
-
-### ❤️ Health
-
-- **GET** `/api/v1/health`  
-  Verifica o status da API e a integridade dos dados carregados.
-
----
-
-### 📊 Stats & Insights
-
-- **GET** `/api/v1/stats/overview`  
-  Estatísticas gerais da coleção (quantidade de livros, preço médio, distribuição de avaliações).
-
-- **GET** `/api/v1/stats/categories/{category}`  
-  Estatísticas detalhadas para uma categoria específica.
-
----
-
-### 🕷 Scraping (Admin)
-
-- **POST** `/api/v1/scraping/trigger`  
-  Executa o processo de web scraping e atualiza o dataset.
-
-> ⚠️ Endpoint protegido por autenticação JWT.
-
----
-
-### 🤖 Machine Learning
-
-- **GET** `/api/v1/ml/features`  
-  Retorna os dados formatados para uso como features em modelos de ML.
-
-- **GET** `/api/v1/ml/training-data`  
-  Retorna conjuntos de treino e teste prontos para treinamento.
-
-- **POST** `/api/v1/ml/predict`  
-  Realiza a predição da avaliação de um livro.
-
-#### Exemplo de Request
-```json
-{
-  "preco": 25.99,
-  "disponibilidade": 1,
-  "categoria": "Science"
-}
-```
-
 ## 🌐 Deploy
 
-🔗 Link da API em produção
+🔗 Link da API em produção 
+https://books-analytics-ml-api.onrender.com/docs
 
 ## 🎥 Vídeo de Apresentação
 
