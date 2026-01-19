@@ -1,6 +1,6 @@
 from typing import Optional
 from fastapi import APIRouter, Query, HTTPException
-from src.api.deps import get_books_cached
+from src.book_api.api .deps import get_books_cached
 
 router = APIRouter(prefix="/api/v1/books", tags=["Books"])
 

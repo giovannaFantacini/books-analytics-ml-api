@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from src.api.routers import auth, books, categories, health, stats, scraping, ml
+from src.book_api.api .routers import auth, books, categories, health, stats, scraping, ml
 
 app = FastAPI(
     title="Tech Challenge Fiap",

@@ -1,7 +1,7 @@
 from functools import lru_cache
 import pandas as pd
 
-from src.api.core.settings import load_books, load_model_bundle
+from src.book_api.api.core.settings import load_books, load_model_bundle
 from src.features.extract_features import extract_features_for_rating_prediction
 
 @lru_cache(maxsize=1)

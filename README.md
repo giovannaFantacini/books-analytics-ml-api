@@ -55,7 +55,7 @@ A API foi construída com **FastAPI**, seguindo boas práticas de organização,
 
 **Site:** [Books to Scrape](https://books.toscrape.com/)
 
-O Books to Scrape é um site de demonstração criado especificamente para práticas de web scraping. Ele simula uma livraria online com aproximadamente **1.000 livros** distribuídos em **50 categorias**.
+O Books to Scrape é um site de demonstração criado especificamente para práticas de web scraping. Ele simula uma livraria online com aproximadamente **500 livros** distribuídos em **50 categorias**.
 
 ### Dados Extraídos
 
@@ -78,17 +78,7 @@ O Books to Scrape é um site de demonstração criado especificamente para prát
 
 ## 🔄 Pipeline de Dados
 
-### Fluxo Completo
-
-```mermaid
-graph LR
-    A[Books to Scrape] -->|Web Scraping| B[Raw Data]
-    B -->|Limpeza/Transformação| C[books.csv]
-    C -->|Feature Engineering| D[Features Dataset]
-    D -->|Train/Test Split| E[Modelo Treinado]
-    C -->|API Endpoints| F[Consumo via REST]
-    E -->|Predição| F
-```
+![Pipeline de Dados](docs/images/PipelineDados.png)
 
 ### Etapas do Pipeline
 
@@ -165,6 +155,7 @@ books-analytics-ml-api/
 ├── 📂 docs/
 │   └── images/                      # Imagens e diagramas da documentação
 │       └── DiagramaProjeto.png
+│       └── PipelineDados.png
 │
 ├── 📂 models/
 │   └── modelo_avaliacao_books.joblib  # Modelo de ML treinado (Random Forest)
@@ -321,13 +312,6 @@ uvicorn src.book_api.api.main:app --reload --host 0.0.0.0 --port 8000
 
 A API utiliza **JSON Web Tokens (JWT)** para autenticação. Algumas rotas são públicas, enquanto outras requerem token válido.
 
-### Rotas Protegidas vs Públicas
-
-| Tipo | Rotas | Autenticação |
-|------|-------|--------------|
-| 🔓 Pública | `/books/*`, `/categories/*`, `/stats/*`, `/health`, `/ml/features`, `/ml/training-data`, `/ml/predict` | Não requerida |
-| 🔒 Protegida | `/scraping/trigger` | JWT obrigatório |
-
 ### Fluxo de Autenticação
 
 ```
@@ -462,8 +446,7 @@ GET /api/v1/health
 ```json
 {
   "status": "healthy",
-  "books_loaded": 500,
-  "model_loaded": true
+  "books_loaded": 517
 }
 ```
 
@@ -570,7 +553,7 @@ curl -X POST "http://localhost:8000/api/v1/scraping/trigger" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### Exemplo 4: Predição de avaliação (sem autenticação)
+### Exemplo 4: Predição de avaliação 
 
 ```bash
 curl -X POST "http://localhost:8000/api/v1/ml/predict" \

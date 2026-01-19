@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.api.deps import get_books_cached
+from src.book_api.api .deps import get_books_cached
 
 router = APIRouter(prefix="/api/v1/categories", tags=["Categories"])
 
