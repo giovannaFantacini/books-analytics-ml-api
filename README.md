@@ -25,7 +25,7 @@ A API foi construída com **FastAPI**, seguindo boas práticas de organização,
 
 ## 🧱 Arquitetura
 
-![Diagrama de Arquitetura](docs/images/architecture.png)
+![Diagrama de Arquitetura](docs/images/DiagramaProjeto.png)
 
 ## 📁 Estrutura do Projeto
 
