@@ -49,13 +49,6 @@ A API foi construída com **FastAPI**, seguindo boas práticas de organização,
 | 8 | Documentação completa no **README** | ✅ |
 | 9 | **Vídeo de apresentação** demonstrando a solução | ✅ |
 
-### Diferenciais Implementados (Bônus)
-
-- ✅ **Modelo de Machine Learning** para predição de avaliação de livros
-- ✅ **Endpoint de predição** (`/ml/predict`) integrado à API
-- ✅ **Feature engineering** com extração e transformação de dados
-- ✅ **Cache de predições** para otimização de performance
-
 ---
 
 ## 📊 Fonte de Dados
