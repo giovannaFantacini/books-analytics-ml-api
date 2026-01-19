@@ -1,1 +1,1 @@
-from api.main import app
+from book_api.api.main import app

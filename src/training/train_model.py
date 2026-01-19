@@ -8,7 +8,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, accuracy_score
 import joblib
-from features.extract_features import extract_features_for_rating_prediction
+from src.features.extract_features import extract_features_for_rating_prediction
 
 
 def find_column(columns, candidates):

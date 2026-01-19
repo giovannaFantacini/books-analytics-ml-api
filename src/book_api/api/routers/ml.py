@@ -2,7 +2,7 @@ import pandas as pd
 from fastapi import APIRouter
 from sklearn.model_selection import train_test_split
 
-from src.api.deps import get_books_cached, get_model_cached, get_features_df
+from src.book_api.api.deps import get_books_cached, get_model_cached, get_features_df
 from src.schema.PredictRequest import PredictRequest
 
 router = APIRouter(prefix="/api/v1/ml", tags=["ML"])
