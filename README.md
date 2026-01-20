@@ -588,7 +588,7 @@ https://books-analytics-ml-api.onrender.com/docs
 ## 🎥 Vídeo de Apresentação
 
 🎬 **Link do vídeo de demonstração:**  
-![Video Demonstração](https://drive.google.com/file/d/167Vd0sjpq6HpIP1WafptSH50XMkKNEXE/view?usp=sharing)
+[Video Demonstração](https://drive.google.com/file/d/167Vd0sjpq6HpIP1WafptSH50XMkKNEXE/view?usp=sharing)
 
 ---
 
